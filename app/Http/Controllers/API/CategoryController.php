@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Controller;
+use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -87,6 +88,9 @@ class CategoryController extends ApiController
      */
     public function destroy(Category $category)
     {
+        $articles = Article::where('category_id', $category->id)->get();
+
+        Article::destroy($articles);
         $category->delete();
         return $this->showOne($category);
     }

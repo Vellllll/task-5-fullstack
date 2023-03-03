@@ -12,7 +12,7 @@ class Article extends Model
     protected $guarded = [];
 
     protected function users(){
-        return $this->belongsTo(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     protected function categories(){

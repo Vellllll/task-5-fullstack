@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -9,66 +10,46 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_get_all_articles():void{
+    public function test_get_all_categories():void{
         $user = User::factory()->create();
-        $token = $user->createToken('passport-token')->accessToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/categories');
+        $response = $this->actingAs($user)->get('/category/all');
 
         $response->assertStatus(200);
+
     }
 
-    public function test_get_one_article():void{
+    public function test_post_category():void{
         $user = User::factory()->create();
-        $token = $user->createToken('passport-token')->accessToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/categories/2');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_post_article():void{
-        $user = User::factory()->create();
-        $token = $user->createToken('passport-token')->accessToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->post('/api/v1/categories', [
-            'name' => 'New category',
-            'user_id' => $user->id,
+        $response = $this->actingAs($user)->post('/category/store', [
+            'name' => 'category',
         ]);
 
-        $response->assertStatus(201);
+        $response->assertRedirect('category/all');
     }
 
-    public function test_update_article():void{
+    public function test_get_category_update_page():void{
         $user = User::factory()->create();
-        $token = $user->createToken('passport-token')->accessToken;
+        $category = Category::factory()->create();
+        $response = $this->actingAs($user)->get('/category/update/' . $category->id . '/page');
 
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->put('/api/v1/categories/2', [
-            'name' => 'Category',
+        $response->assertStatus(200);
+    }
+
+    public function test_update_category():void{
+        $user = User::factory()->create();
+        $category = Category::factory()->create();
+        $response = $this->actingAs($user)->put('/category/update/' . $category , [
+            'name' => 'Updated category',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertSessionHasNoErrors();
     }
 
-    public function test_delete_article():void{
+    public function test_delete_category():void{
         $user = User::factory()->create();
-        $token = $user->createToken('passport-token')->accessToken;
+        $category = Category::factory()->create();
+        $response = $this->actingAs($user)->delete('/category/delete/' . $category);
 
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->delete('/api/v1/categories/2');
-
-        $response->assertStatus(200);
+        $response->assertSessionHasNoErrors();
     }
 }
